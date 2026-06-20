@@ -18,10 +18,20 @@
   &.completed {
     opacity: 0.6;
   }
+
+  &.tomorrow {
+    background: rgba(114, 46, 209, 0.05);
+    margin: 0 -$spacing-sm;
+    padding-left: $spacing-md;
+    padding-right: $spacing-md;
+    border-radius: $radius-sm;
+    margin-bottom: 8rpx;
+  }
 }
 
 .checkbox {
   margin-right: $spacing-md;
+  flex-shrink: 0;
 }
 
 .checked {
@@ -45,6 +55,20 @@
   background: $color-bg-card;
 }
 
+.tomorrowBox {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background: rgba(114, 46, 209, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tomorrowIcon {
+  font-size: 22rpx;
+}
+
 .content {
   flex: 1;
 }
@@ -60,6 +84,32 @@
 .status {
   font-size: $font-size-sm;
   color: $color-text-tertiary;
+}
+
+.photoPreview {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-right: $spacing-md;
+  padding: 4rpx 12rpx;
+  background: rgba(0, 176, 80, 0.1);
+  border-radius: $radius-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.photoImg {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-xs;
+}
+
+.photoLabel {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-medium;
 }
 
 .actions {

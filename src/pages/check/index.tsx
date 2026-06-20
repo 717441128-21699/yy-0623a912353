@@ -1,85 +1,143 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
-import { mockPatients } from '@/data/mockPatients';
-import type { Patient, CheckItemKey } from '@/types/patient';
+import CheckItem from '@/components/CheckItem';
+import { usePatientStore } from '@/store/usePatientStore';
+import type { CheckItemKey, CheckItemStatus } from '@/types/patient';
 import classnames from 'classnames';
 
-type FilterType = 'all' | 'pending' | 'completed';
+type FilterType = 'all' | 'pending' | 'tomorrow' | 'completed';
 
 const CheckPage: React.FC = () => {
-  const [patients, setPatients] = useState<Patient[]>(mockPatients);
+  const { patients, updateCheckItem, addPhoto } = usePatientStore();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<FilterType>('all');
 
   const stats = useMemo(() => {
     const total = patients.length;
     const completed = patients.filter(p => 
-      p.checkItems.every(item => item.completed)
+      p.checkItems.every(item => item.status === 'completed')
     ).length;
-    const pending = total - completed;
+    const pending = patients.filter(p => 
+      p.checkItems.some(item => item.status === 'pending')
+    ).length;
+    const tomorrow = patients.filter(p => 
+      p.checkItems.some(item => item.status === 'tomorrow')
+    ).length;
     const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { total, completed, pending, percent };
+    return { total, completed, pending, tomorrow, percent };
   }, [patients]);
 
   const filteredPatients = useMemo(() => {
     if (filter === 'all') return patients;
     if (filter === 'completed') {
-      return patients.filter(p => p.checkItems.every(item => item.completed));
+      return patients.filter(p => p.checkItems.every(item => item.status === 'completed'));
     }
-    return patients.filter(p => p.checkItems.some(item => !item.completed));
+    if (filter === 'tomorrow') {
+      return patients.filter(p => p.checkItems.some(item => item.status === 'tomorrow'));
+    }
+    return patients.filter(p => p.checkItems.some(item => item.status === 'pending'));
   }, [patients, filter]);
 
-  const toggleExpand = (id: string) => {
-    const newExpanded = new Set(expandedIds);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
+  const toggleExpand = useCallback((id: string) => {
+    setExpandedIds(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(id)) {
+        newExpanded.delete(id);
+      } else {
+        newExpanded.add(id);
+      }
+      return newExpanded;
+    });
+  }, []);
+
+  const toggleCheckItem = useCallback((patientId: string, itemKey: CheckItemKey) => {
+    const patient = patients.find(p => p.id === patientId);
+    const item = patient?.checkItems.find(i => i.key === itemKey);
+    if (!item) return;
+
+    const currentStatus = item.status || (item.completed ? 'completed' : 'pending');
+    let newStatus: CheckItemStatus;
+    if (currentStatus === 'completed') {
+      newStatus = 'pending';
     } else {
-      newExpanded.add(id);
+      newStatus = 'completed';
     }
-    setExpandedIds(newExpanded);
-  };
+    
+    updateCheckItem(patientId, itemKey, newStatus);
+  }, [patients, updateCheckItem]);
 
-  const toggleCheckItem = (patientId: string, itemKey: CheckItemKey) => {
-    setPatients(prev => prev.map(p => {
-      if (p.id !== patientId) return p;
-      return {
-        ...p,
-        checkItems: p.checkItems.map(item => {
-          if (item.key !== itemKey) return item;
-          return { ...item, completed: !item.completed };
-        })
-      };
-    }));
-  };
-
-  const handlePhoto = (patientId: string, itemKey: CheckItemKey) => {
-    Taro.showActionSheet({
-      itemList: ['拍照', '从相册选择'],
+  const handlePhoto = useCallback((patientId: string, itemKey: CheckItemKey) => {
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
       success: (res) => {
-        if (res.tapIndex === 0 || res.tapIndex === 1) {
-          Taro.showToast({ title: '拍照补录成功', icon: 'success' });
-          toggleCheckItem(patientId, itemKey);
+        const tempFilePaths = res.tempFilePaths;
+        if (tempFilePaths && tempFilePaths.length > 0) {
+          console.log('[CheckPage] 选择图片成功:', tempFilePaths[0]);
+          addPhoto(patientId, itemKey, tempFilePaths[0]);
+          Taro.showToast({ title: '照片已补录', icon: 'success' });
         }
+      },
+      fail: (err) => {
+        console.log('[CheckPage] 选择图片失败:', err);
+        if (err.errMsg?.includes('cancel')) {
+          return;
+        }
+        Taro.showToast({ title: '拍照失败，请重试', icon: 'none' });
       }
     });
-  };
+  }, [addPhoto]);
 
-  const handleMarkTomorrow = (patientId: string, itemKey: string) => {
+  const handleMarkTomorrow = useCallback((patientId: string, itemKey: CheckItemKey) => {
     Taro.showModal({
       title: '标记明日处理',
-      content: '确定将此项目标记为明日处理吗？',
+      content: '确定将此项目标记为明日处理吗？标记后将与普通待完善区分显示。',
+      confirmText: '确定标记',
       success: (res) => {
         if (res.confirm) {
+          updateCheckItem(patientId, itemKey, 'tomorrow');
           Taro.showToast({ title: '已标记明日处理', icon: 'success' });
         }
       }
     });
+  }, [updateCheckItem]);
+
+  const isPatientCompleted = (patient: typeof patients[0]) => {
+    return patient.checkItems.every(item => item.status === 'completed');
   };
 
-  const isPatientCompleted = (patient: Patient) => {
-    return patient.checkItems.every(item => item.completed);
+  const isPatientHasTomorrow = (patient: typeof patients[0]) => {
+    return patient.checkItems.some(item => item.status === 'tomorrow');
+  };
+
+  const getPendingCount = (patient: typeof patients[0]) => {
+    return patient.checkItems.filter(i => i.status === 'pending').length;
+  };
+
+  const getTomorrowCount = (patient: typeof patients[0]) => {
+    return patient.checkItems.filter(i => i.status === 'tomorrow').length;
+  };
+
+  const getStatusText = (patient: typeof patients[0]) => {
+    const pendingCount = getPendingCount(patient);
+    const tomorrowCount = getTomorrowCount(patient);
+    if (isPatientCompleted(patient)) return '全部完成';
+    if (pendingCount > 0 && tomorrowCount > 0) {
+      return `${pendingCount}项待完善 · ${tomorrowCount}项明日`;
+    }
+    if (pendingCount > 0) return `${pendingCount}项待完善`;
+    if (tomorrowCount > 0) return `${tomorrowCount}项明日处理`;
+    return '';
+  };
+
+  const getStatusColor = (patient: typeof patients[0]) => {
+    if (isPatientCompleted(patient)) return '#00b42a';
+    if (getPendingCount(patient) > 0) return '#ff7d00';
+    if (getTomorrowCount(patient) > 0) return '#722ed1';
+    return '#86909c';
   };
 
   return (
@@ -115,6 +173,13 @@ const CheckPage: React.FC = () => {
           待自查 {stats.pending}
         </View>
         <View 
+          className={classnames(styles.filterTab, filter === 'tomorrow' && styles.active)}
+          onClick={() => setFilter('tomorrow')}
+          style={filter === 'tomorrow' ? { background: '#722ed1', color: '#fff' } : {}}
+        >
+          明日 {stats.tomorrow}
+        </View>
+        <View 
           className={classnames(styles.filterTab, filter === 'completed' && styles.active)}
           onClick={() => setFilter('completed')}
         >
@@ -123,7 +188,7 @@ const CheckPage: React.FC = () => {
       </View>
 
       <View className={styles.content}>
-        {stats.pending === 0 && filter === 'all' && (
+        {stats.pending === 0 && stats.tomorrow === 0 && filter === 'all' && (
           <View className={styles.allDoneTip}>
             <Text className={styles.allDoneTitle}>🎉 今日自查全部完成</Text>
             <Text className={styles.allDoneDesc}>太棒了！今天的医疗质量控制做得很好</Text>
@@ -134,20 +199,25 @@ const CheckPage: React.FC = () => {
           <View className={styles.emptyState}>
             <Text className={styles.emptyIcon}>📋</Text>
             <Text className={styles.emptyText}>
-              {filter === 'completed' ? '暂无已完成自查的病例' : '暂无待自查的病例'}
+              {filter === 'completed' && '暂无已完成自查的病例'}
+              {filter === 'pending' && '暂无待自查的病例'}
+              {filter === 'tomorrow' && '暂无标记明日处理的病例'}
+              {filter === 'all' && '暂无病例'}
             </Text>
           </View>
         ) : (
           filteredPatients.map(patient => {
             const isExpanded = expandedIds.has(patient.id);
             const isCompleted = isPatientCompleted(patient);
+            const hasTomorrow = isPatientHasTomorrow(patient);
 
             return (
               <View 
                 key={patient.id} 
                 className={classnames(
                   styles.checkCard,
-                  isCompleted && styles.completed
+                  isCompleted && styles.completed,
+                  hasTomorrow && !isCompleted && styles.hasTomorrow
                 )}
               >
                 <View 
@@ -170,21 +240,26 @@ const CheckPage: React.FC = () => {
 
                   <View style={{ display: 'flex', alignItems: 'center' }}>
                     <View className={styles.checkDots}>
-                      {patient.checkItems.map(item => (
-                        <View 
-                          key={item.key}
-                          className={classnames(
-                            styles.checkDot,
-                            item.completed ? styles.done : styles.pending
-                          )}
-                        >
-                          {item.completed ? '✓' : ''}
-                        </View>
-                      ))}
+                      {patient.checkItems.map(item => {
+                        const status = item.status || (item.completed ? 'completed' : 'pending');
+                        return (
+                          <View 
+                            key={item.key}
+                            className={classnames(
+                              styles.checkDot,
+                              status === 'completed' && styles.done,
+                              status === 'tomorrow' && styles.dotTomorrow,
+                              status === 'pending' && styles.pending
+                            )}
+                          >
+                            {status === 'completed' ? '✓' : status === 'tomorrow' ? '📅' : ''}
+                          </View>
+                        );
+                      })}
                     </View>
                     {!isCompleted && (
-                      <Text className={styles.pendingCount}>
-                        {patient.checkItems.filter(i => !i.completed).length}项
+                      <Text className={styles.pendingCount} style={{ color: getStatusColor(patient) }}>
+                        {getStatusText(patient)}
                       </Text>
                     )}
                     <Text className={classnames(
@@ -199,43 +274,14 @@ const CheckPage: React.FC = () => {
                 {isExpanded && (
                   <View className={styles.checkList}>
                     {patient.checkItems.map(item => (
-                      <View key={item.key} className={styles.checkItemRow}>
-                        <View 
-                          className={classnames(
-                            styles.checkBox,
-                            item.completed ? styles.checked : styles.unchecked
-                          )}
-                          onClick={() => toggleCheckItem(patient.id, item.key)}
-                        >
-                          {item.completed && '✓'}
-                        </View>
-
-                        <View className={styles.itemInfo}>
-                          <Text className={styles.itemName}>{item.name}</Text>
-                          <Text className={styles.itemStatus}>
-                            {item.completed ? '已完成' : '待完善'}
-                          </Text>
-                        </View>
-
-                        {!item.completed && (
-                          <View className={styles.itemActions}>
-                            {item.canPhoto && (
-                              <View 
-                                className={classnames(styles.actionBtn, styles.photo)}
-                                onClick={() => handlePhoto(patient.id, item.key)}
-                              >
-                                <Text>拍照</Text>
-                              </View>
-                            )}
-                            <View 
-                              className={classnames(styles.actionBtn, styles.tomorrow)}
-                              onClick={() => handleMarkTomorrow(patient.id, item.key)}
-                            >
-                              <Text>明日</Text>
-                            </View>
-                          </View>
-                        )}
-                      </View>
+                      <CheckItem
+                        key={item.key}
+                        item={item}
+                        showActions
+                        onPhoto={() => handlePhoto(patient.id, item.key)}
+                        onMarkTomorrow={() => handleMarkTomorrow(patient.id, item.key)}
+                        onToggle={() => toggleCheckItem(patient.id, item.key)}
+                      />
                     ))}
                   </View>
                 )}

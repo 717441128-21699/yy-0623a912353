@@ -14,10 +14,10 @@ export const mockPatients: Patient[] = [
     endTime: '09:45',
     fee: 380,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: [],
     followUpDate: '2024-06-27'
@@ -35,10 +35,10 @@ export const mockPatients: Patient[] = [
     endTime: '11:00',
     fee: 680,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: true, status: 'completed' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: []
   },
@@ -55,10 +55,10 @@ export const mockPatients: Patient[] = [
     endTime: '15:00',
     fee: 860,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: false },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: false },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: false, status: 'pending' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: false, status: 'pending' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: [
       { type: 'noConsent', name: '未签知情同意', description: '补牙知情同意书未签署' }
@@ -77,10 +77,10 @@ export const mockPatients: Patient[] = [
     endTime: '16:15',
     fee: 520,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: true, status: 'completed' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: []
   },
@@ -97,10 +97,10 @@ export const mockPatients: Patient[] = [
     endTime: '10:30',
     fee: 1200,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: [
       { type: 'noFollowUp', name: '复诊未约', description: '拔牙后7天复诊未预约' }
@@ -119,10 +119,10 @@ export const mockPatients: Patient[] = [
     endTime: '15:15',
     fee: 450,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: true },
-      { key: 'advice', name: '处置医嘱', completed: false },
-      { key: 'signature', name: '患者签字', completed: false }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: true, status: 'completed' },
+      { key: 'advice', name: '处置医嘱', completed: false, status: 'pending' },
+      { key: 'signature', name: '患者签字', completed: false, status: 'pending' },}
     ],
     risks: [
       { type: 'feeMismatch', name: '收费不匹配', description: '收费项目与治疗项目不符' },
@@ -143,10 +143,10 @@ export const mockPatients: Patient[] = [
     endTime: '11:15',
     fee: 400,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: []
   },
@@ -163,10 +163,10 @@ export const mockPatients: Patient[] = [
     endTime: '17:00',
     fee: 980,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: false },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: false },
-      { key: 'signature', name: '患者签字', completed: false }
+      { key: 'record', name: '病历书写', completed: false, status: 'pending' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: false, status: 'pending' },
+      { key: 'signature', name: '患者签字', completed: false, status: 'pending' },}
     ],
     risks: [
       { type: 'noConsent', name: '未签知情同意', description: '根管治疗知情同意书未签署' },
@@ -186,10 +186,10 @@ export const mockPatients: Patient[] = [
     endTime: '12:00',
     fee: 1500,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: true }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: true, status: 'completed' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: true, status: 'completed' },}
     ],
     risks: []
   },
@@ -205,10 +205,10 @@ export const mockPatients: Patient[] = [
     endTime: '14:30',
     fee: 1800,
     checkItems: [
-      { key: 'record', name: '病历书写', completed: true },
-      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true },
-      { key: 'advice', name: '处置医嘱', completed: true },
-      { key: 'signature', name: '患者签字', completed: false }
+      { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+      { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+      { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+      { key: 'signature', name: '患者签字', completed: false, status: 'pending' },}
     ],
     risks: [
       { type: 'noConsent', name: '未签知情同意', description: '美白知情同意书未签署' }
@@ -253,7 +253,19 @@ export function getRiskPatients(patients: Patient[]): Patient[] {
 
 export function getPendingCheckPatients(patients: Patient[]): Patient[] {
   return patients.filter(p => 
-    p.checkItems.some(item => !item.completed)
+    p.checkItems.some(item => item.status === 'pending')
+  );
+}
+
+export function getTomorrowCheckPatients(patients: Patient[]): Patient[] {
+  return patients.filter(p => 
+    p.checkItems.some(item => item.status === 'tomorrow')
+  );
+}
+
+export function getCompletedCheckPatients(patients: Patient[]): Patient[] {
+  return patients.filter(p => 
+    p.checkItems.every(item => item.status === 'completed')
   );
 }
 
@@ -261,7 +273,8 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
   const totalPatients = patients.length;
   const riskPatients = getRiskPatients(patients);
   const pendingPatients = getPendingCheckPatients(patients);
-  const completedCheck = patients.length - pendingPatients.length;
+  const tomorrowPatients = getTomorrowCheckPatients(patients);
+  const completedPatients = getCompletedCheckPatients(patients);
 
   const riskByTypeMap: Record<string, { type: any; name: string; count: number }> = {
     noConsent: { type: 'noConsent', name: '未签知情同意', count: 0 },
@@ -281,8 +294,9 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
 
   const doctorIssueMap: Record<string, number> = {};
   patients.forEach(patient => {
-    const hasIssue = patient.checkItems.some(item => !item.completed) || patient.risks.length > 0;
-    if (hasIssue) {
+    const hasPending = patient.checkItems.some(item => item.status === 'pending');
+    const hasRisk = patient.risks.length > 0;
+    if (hasPending || hasRisk) {
       doctorIssueMap[patient.doctor] = (doctorIssueMap[patient.doctor] || 0) + 1;
     }
   });
@@ -291,15 +305,26 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
     .map(([role, count]) => ({ role, count }))
     .sort((a, b) => b.count - a.count);
 
-  const totalIssues = pendingPatients.reduce((sum, p) => {
-    return sum + p.checkItems.filter(item => !item.completed).length;
-  }, 0) + riskPatients.reduce((sum, p) => sum + p.risks.length, 0);
+  const pendingCount = patients.reduce((sum, p) => {
+    return sum + p.checkItems.filter(item => item.status === 'pending').length;
+  }, 0);
+  const tomorrowCount = patients.reduce((sum, p) => {
+    return sum + p.checkItems.filter(item => item.status === 'tomorrow').length;
+  }, 0);
+  const riskCount = riskPatients.reduce((sum, p) => sum + p.risks.length, 0);
+  const totalIssues = pendingCount + tomorrowCount + riskCount;
 
   const today = new Date();
   const dateStr = `${today.getMonth() + 1}月${today.getDate()}日`;
   
   let summaryText = `【${dateStr} 晚间质控小结】\n\n`;
-  summaryText += `今日就诊患者共 ${totalPatients} 人，发现问题 ${totalIssues} 项。\n\n`;
+  summaryText += `今日就诊患者共 ${totalPatients} 人。\n`;
+  summaryText += `✅ 已完成自查：${completedPatients.length} 人\n`;
+  summaryText += `⏳ 待完善：${pendingCount} 项\n`;
+  if (tomorrowCount > 0) {
+    summaryText += `📅 标记明日处理：${tomorrowCount} 项\n`;
+  }
+  summaryText += `⚠️ 风险项：${riskCount} 项\n\n`;
   
   if (riskByType.length > 0) {
     summaryText += `主要风险：\n`;
@@ -318,16 +343,22 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
   }
 
   summaryText += `整改要求：\n`;
-  summaryText += `1. 未完善病历请明早10点前补齐\n`;
-  summaryText += `2. 未签知情同意的病例务必补签\n`;
-  summaryText += `3. 复诊未约的患者请前台跟进\n`;
-  summaryText += `4. 各医生请重视医疗文书质量\n\n`;
+  if (pendingCount > 0) {
+    summaryText += `1. 今晚请待完善项目的医生尽快补齐\n`;
+  }
+  if (tomorrowCount > 0) {
+    summaryText += `2. 标记明日处理的项目请明早10点前完成\n`;
+  }
+  summaryText += `3. 未签知情同意的病例务必补签\n`;
+  summaryText += `4. 复诊未约的患者请前台跟进\n`;
+  summaryText += `5. 各医生请重视医疗文书质量\n\n`;
   summaryText += `请大家今晚认真复盘，明天晨会通报。`;
 
   return {
     totalPatients,
-    completedCheck,
+    completedCheck: completedPatients.length,
     pendingCheck: pendingPatients.length,
+    tomorrowCheck: tomorrowPatients.length,
     riskCount: riskPatients.length,
     riskByType,
     issuesByRole,

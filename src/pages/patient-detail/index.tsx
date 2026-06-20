@@ -1,68 +1,138 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useRouter } from '@tarojs/taro';
 import styles from './index.module.scss';
-import { mockPatients, treatmentTypeMap } from '@/data/mockPatients';
-import type { CheckItemKey } from '@/types/patient';
+import CheckItem from '@/components/CheckItem';
+import { usePatientStore } from '@/store/usePatientStore';
+import { treatmentTypeMap } from '@/data/mockPatients';
+import type { CheckItemKey, CheckItemStatus } from '@/types/patient';
 import classnames from 'classnames';
 
 const PatientDetailPage: React.FC = () => {
   const router = useRouter();
   const patientId = router.params.id || '001';
 
-  const [patient, setPatient] = useState(() => {
-    return mockPatients.find(p => p.id === patientId) || mockPatients[0];
-  });
+  const { 
+    patients, 
+    updateCheckItem, 
+    addPhoto, 
+    markAllCheckItemsCompleted,
+    getPatientById 
+  } = usePatientStore();
+
+  const patient = useMemo(() => {
+    return getPatientById(patientId) || patients[0];
+  }, [patients, patientId, getPatientById]);
 
   const typeInfo = useMemo(() => {
     return treatmentTypeMap[patient.treatmentType] || { name: '其他', color: '#86909c' };
   }, [patient]);
 
-  const toggleCheckItem = (itemKey: CheckItemKey) => {
-    setPatient(prev => ({
-      ...prev,
-      checkItems: prev.checkItems.map(item => {
-        if (item.key !== itemKey) return item;
-        return { ...item, completed: !item.completed };
-      })
-    }));
-  };
+  const toggleCheckItem = useCallback((itemKey: CheckItemKey) => {
+    const item = patient.checkItems.find(i => i.key === itemKey);
+    if (!item) return;
 
-  const handlePhoto = (itemKey: CheckItemKey) => {
-    Taro.showActionSheet({
-      itemList: ['拍照补录', '从相册选择'],
+    const currentStatus = item.status || (item.completed ? 'completed' : 'pending');
+    let newStatus: CheckItemStatus;
+    if (currentStatus === 'completed') {
+      newStatus = 'pending';
+    } else {
+      newStatus = 'completed';
+    }
+    
+    updateCheckItem(patientId, itemKey, newStatus);
+  }, [patient, patientId, updateCheckItem]);
+
+  const handlePhoto = useCallback((itemKey: CheckItemKey) => {
+    Taro.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
       success: (res) => {
-        if (res.tapIndex === 0 || res.tapIndex === 1) {
-          Taro.showToast({ title: '补录成功', icon: 'success' });
-          toggleCheckItem(itemKey);
+        const tempFilePaths = res.tempFilePaths;
+        if (tempFilePaths && tempFilePaths.length > 0) {
+          console.log('[PatientDetail] 选择图片成功:', tempFilePaths[0]);
+          addPhoto(patientId, itemKey, tempFilePaths[0]);
+          Taro.showToast({ title: '照片已补录', icon: 'success' });
         }
+      },
+      fail: (err) => {
+        console.log('[PatientDetail] 选择图片失败:', err);
+        if (err.errMsg?.includes('cancel')) {
+          return;
+        }
+        Taro.showToast({ title: '拍照失败，请重试', icon: 'none' });
       }
     });
-  };
+  }, [patientId, addPhoto]);
 
-  const handleMarkTomorrow = (itemKey: string) => {
+  const handleMarkTomorrow = useCallback((itemKey: CheckItemKey) => {
     Taro.showModal({
       title: '标记明日处理',
-      content: '确定将此项目标记为明日处理吗？',
+      content: '确定将此项目标记为明日处理吗？标记后将与普通待完善区分显示。',
+      confirmText: '确定标记',
       success: (res) => {
         if (res.confirm) {
-          Taro.showToast({ title: '已标记', icon: 'success' });
+          updateCheckItem(patientId, itemKey, 'tomorrow');
+          Taro.showToast({ title: '已标记明日处理', icon: 'success' });
         }
       }
     });
+  }, [patientId, updateCheckItem]);
+
+  const handleMarkAllDone = useCallback(() => {
+    Taro.showModal({
+      title: '全部标记完成',
+      content: '确定将所有检查项标记为已完成吗？',
+      success: (res) => {
+        if (res.confirm) {
+          markAllCheckItemsCompleted(patientId);
+          Taro.showToast({ title: '已全部标记完成', icon: 'success' });
+        }
+      }
+    });
+  }, [patientId, markAllCheckItemsCompleted]);
+
+  const getStatusText = (item: typeof patient.checkItems[0]) => {
+    const status = item.status || (item.completed ? 'completed' : 'pending');
+    switch (status) {
+      case 'completed': return '已完成';
+      case 'tomorrow': return '明日处理';
+      default: return '待完善';
+    }
   };
 
-  const handleMarkAllDone = () => {
-    setPatient(prev => ({
-      ...prev,
-      checkItems: prev.checkItems.map(item => ({ ...item, completed: true }))
-    }));
-    Taro.showToast({ title: '已全部标记完成', icon: 'success' });
+  const getStatusColor = (item: typeof patient.checkItems[0]) => {
+    const status = item.status || (item.completed ? 'completed' : 'pending');
+    switch (status) {
+      case 'completed': return '#00b42a';
+      case 'tomorrow': return '#722ed1';
+      default: return '#86909c';
+    }
   };
 
-  const completedCount = patient.checkItems.filter(i => i.completed).length;
+  const completedCount = patient.checkItems.filter(i => {
+    const status = i.status || (i.completed ? 'completed' : 'pending');
+    return status === 'completed';
+  }).length;
   const totalCount = patient.checkItems.length;
+  const pendingCount = patient.checkItems.filter(i => {
+    const status = i.status || (i.completed ? 'completed' : 'pending');
+    return status === 'pending';
+  }).length;
+  const tomorrowCount = patient.checkItems.filter(i => {
+    const status = i.status || (i.completed ? 'completed' : 'pending');
+    return status === 'tomorrow';
+  }).length;
+
+  useEffect(() => {
+    console.log('[PatientDetail] 患者数据已更新:', patientId, {
+      completed: completedCount,
+      pending: pendingCount,
+      tomorrow: tomorrowCount
+    });
+  }, [patientId, completedCount, pendingCount, tomorrowCount]);
 
   return (
     <ScrollView scrollY className={styles.container}>
@@ -145,45 +215,26 @@ const PatientDetailPage: React.FC = () => {
         <View className={styles.card}>
           <View className={styles.sectionTitle}>
             <View className={styles.sectionDot} style={{ backgroundColor: '#ff7d00' }} />
-            <Text>自查项目 ({completedCount}/{totalCount})</Text>
+            <Text>
+              自查项目 ({completedCount}/{totalCount})
+              {pendingCount > 0 && <Text style={{ color: '#ff7d00', fontSize: '24rpx', marginLeft: '16rpx' }}>
+                {pendingCount}项待完善
+              </Text>}
+              {tomorrowCount > 0 && <Text style={{ color: '#722ed1', fontSize: '24rpx', marginLeft: '16rpx' }}>
+                {tomorrowCount}项明日
+              </Text>}
+            </Text>
           </View>
           <View className={styles.checkList}>
             {patient.checkItems.map(item => (
-              <View key={item.key} className={styles.checkItem}>
-                <View 
-                  className={classnames(
-                    styles.checkBox,
-                    item.completed ? styles.checked : styles.unchecked
-                  )}
-                  onClick={() => toggleCheckItem(item.key)}
-                >
-                  {item.completed && '✓'}
-                </View>
-                <View className={styles.itemContent}>
-                  <Text className={styles.itemName}>{item.name}</Text>
-                  <Text className={styles.itemStatus}>
-                    {item.completed ? '已完成' : '待完善'}
-                  </Text>
-                </View>
-                {!item.completed && (
-                  <View className={styles.itemActions}>
-                    {item.canPhoto && (
-                      <View 
-                        className={classnames(styles.actionBtn, styles.photo)}
-                        onClick={() => handlePhoto(item.key)}
-                      >
-                        <Text>拍照补录</Text>
-                      </View>
-                    )}
-                    <View 
-                      className={classnames(styles.actionBtn, styles.tomorrow)}
-                      onClick={() => handleMarkTomorrow(item.key)}
-                    >
-                      <Text>明日处理</Text>
-                    </View>
-                  </View>
-                )}
-              </View>
+              <CheckItem
+                key={item.key}
+                item={item}
+                showActions
+                onPhoto={() => handlePhoto(item.key)}
+                onMarkTomorrow={() => handleMarkTomorrow(item.key)}
+                onToggle={() => toggleCheckItem(item.key)}
+              />
             ))}
           </View>
         </View>

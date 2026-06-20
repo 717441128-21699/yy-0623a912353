@@ -1,26 +1,28 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
-import { mockPatients, calculateSummary } from '@/data/mockPatients';
+import { usePatientStore } from '@/store/usePatientStore';
+import { calculateSummary } from '@/data/mockPatients';
 import classnames from 'classnames';
 
 const SummaryPage: React.FC = () => {
-  const summary = useMemo(() => calculateSummary(mockPatients), []);
+  const { patients } = usePatientStore();
+  const summary = useMemo(() => calculateSummary(patients), [patients]);
 
   const maxRiskCount = Math.max(...summary.riskByType.map(r => r.count), 1);
   const maxRoleCount = Math.max(...summary.issuesByRole.map(r => r.count), 1);
 
-  const handleCopy = () => {
+  const handleCopy = useCallback(() => {
     Taro.setClipboardData({
       data: summary.summaryText,
       success: () => {
         Taro.showToast({ title: '已复制到剪贴板', icon: 'success' });
       }
     });
-  };
+  }, [summary.summaryText]);
 
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     Taro.showActionSheet({
       itemList: ['发送到微信群', '发送给同事', '复制文字'],
       success: (res) => {
@@ -31,7 +33,7 @@ const SummaryPage: React.FC = () => {
         }
       }
     });
-  };
+  }, [handleCopy]);
 
   const getRiskIcon = (type: string) => {
     switch (type) {
@@ -74,6 +76,12 @@ const SummaryPage: React.FC = () => {
               <Text className={styles.statNumber}>{summary.completedCheck}</Text>
               <Text className={styles.statLabel}>已自查</Text>
             </View>
+            {summary.tomorrowCheck > 0 && (
+              <View className={classnames(styles.statItem, styles.statTomorrow)}>
+                <Text className={styles.statNumber}>{summary.tomorrowCheck}</Text>
+                <Text className={styles.statLabel}>明日</Text>
+              </View>
+            )}
             <View className={classnames(styles.statItem, styles.statWarning)}>
               <Text className={styles.statNumber}>{summary.pendingCheck}</Text>
               <Text className={styles.statLabel}>待完善</Text>

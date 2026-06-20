@@ -4,11 +4,15 @@ export type CheckItemKey = 'record' | 'photos' | 'advice' | 'signature';
 
 export type RiskType = 'noConsent' | 'feeMismatch' | 'noFollowUp';
 
+export type CheckItemStatus = 'completed' | 'pending' | 'tomorrow';
+
 export interface CheckItem {
   key: CheckItemKey;
   name: string;
   completed: boolean;
   canPhoto?: boolean;
+  status?: CheckItemStatus;
+  photoUrl?: string;
 }
 
 export interface RiskItem {
@@ -47,6 +51,7 @@ export interface SummaryStat {
   totalPatients: number;
   completedCheck: number;
   pendingCheck: number;
+  tomorrowCheck: number;
   riskCount: number;
   riskByType: { type: RiskType; name: string; count: number }[];
   issuesByRole: { role: string; count: number }[];

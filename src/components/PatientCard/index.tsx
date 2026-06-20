@@ -14,8 +14,14 @@ interface PatientCardProps {
 
 const PatientCard: React.FC<PatientCardProps> = ({ patient, showRiskTag = false, onClick }) => {
   const typeInfo = treatmentTypeMap[patient.treatmentType] || { name: '其他', color: '#86909c' };
-  const pendingCount = patient.checkItems.filter(item => !item.completed).length;
+  
+  const pendingCount = patient.checkItems.filter(item => item.status === 'pending').length;
+  const tomorrowCount = patient.checkItems.filter(item => item.status === 'tomorrow').length;
+  const completedCount = patient.checkItems.filter(item => item.status === 'completed').length;
+  const isAllCompleted = completedCount === patient.checkItems.length;
+  
   const hasRisk = patient.risks.length > 0;
+  const hasTomorrow = tomorrowCount > 0;
 
   const handleClick = () => {
     if (onClick) {
@@ -27,9 +33,30 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, showRiskTag = false,
     }
   };
 
+  const getStatusText = () => {
+    if (isAllCompleted) return '全部完成';
+    if (pendingCount > 0 && tomorrowCount > 0) {
+      return `${pendingCount}项待完善 · ${tomorrowCount}项明日`;
+    }
+    if (pendingCount > 0) return `${pendingCount}项待完善`;
+    if (tomorrowCount > 0) return `${tomorrowCount}项明日处理`;
+    return '';
+  };
+
+  const getStatusColor = () => {
+    if (isAllCompleted) return '#00b42a';
+    if (pendingCount > 0) return '#ff7d00';
+    if (tomorrowCount > 0) return '#722ed1';
+    return '#86909c';
+  };
+
   return (
     <View 
-      className={classnames(styles.card, hasRisk && styles.hasRisk)} 
+      className={classnames(
+        styles.card, 
+        hasRisk && styles.hasRisk,
+        isAllCompleted && styles.allCompleted
+      )} 
       onClick={handleClick}
     >
       <View className={styles.header}>
@@ -61,27 +88,41 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, showRiskTag = false,
 
       <View className={styles.footer}>
         <View className={styles.checkStatus}>
-          {patient.checkItems.map(item => (
-            <View 
-              key={item.key} 
-              className={classnames(
-                styles.checkDot,
-                item.completed ? styles.completed : styles.pending
-              )}
-            >
-              {item.completed ? '✓' : ''}
-            </View>
-          ))}
-          {pendingCount > 0 && (
-            <Text className={styles.pendingText}>{pendingCount}项待完善</Text>
+          {patient.checkItems.map(item => {
+            const status = item.status || (item.completed ? 'completed' : 'pending');
+            return (
+              <View 
+                key={item.key} 
+                className={classnames(
+                  styles.checkDot,
+                  status === 'completed' && styles.completed,
+                  status === 'tomorrow' && styles.tomorrow,
+                  status === 'pending' && styles.pending
+                )}
+              >
+                {status === 'completed' ? '✓' : status === 'tomorrow' ? '📅' : ''}
+              </View>
+            );
+          })}
+          {(pendingCount > 0 || tomorrowCount > 0) && (
+            <Text className={styles.pendingText} style={{ color: getStatusColor() }}>
+              {getStatusText()}
+            </Text>
           )}
         </View>
         
-        {showRiskTag && hasRisk && (
-          <View className={styles.riskTag}>
-            <Text className={styles.riskText}>⚠ {patient.risks.length}项风险</Text>
-          </View>
-        )}
+        <View className={styles.rightTags}>
+          {hasTomorrow && (
+            <View className={styles.tomorrowTag}>
+              <Text className={styles.tomorrowTagText}>📅 明日</Text>
+            </View>
+          )}
+          {showRiskTag && hasRisk && (
+            <View className={styles.riskTag}>
+              <Text className={styles.riskText}>⚠ {patient.risks.length}项风险</Text>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );

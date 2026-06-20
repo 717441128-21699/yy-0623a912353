@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from '@tarojs/components';
+import { View, Text, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import classnames from 'classnames';
@@ -20,12 +20,12 @@ const CheckItem: React.FC<CheckItemProps> = ({
   onToggle,
   showActions = false
 }) => {
+  const status = item.status || (item.completed ? 'completed' : 'pending');
+
   const handlePhoto = (e) => {
     e.stopPropagation();
     if (onPhoto) {
       onPhoto();
-    } else {
-      Taro.showToast({ title: '拍照补录', icon: 'none' });
     }
   };
 
@@ -33,8 +33,6 @@ const CheckItem: React.FC<CheckItemProps> = ({
     e.stopPropagation();
     if (onMarkTomorrow) {
       onMarkTomorrow();
-    } else {
-      Taro.showToast({ title: '已标记明日处理', icon: 'success' });
     }
   };
 
@@ -44,30 +42,71 @@ const CheckItem: React.FC<CheckItemProps> = ({
     }
   };
 
+  const handlePreviewPhoto = (e) => {
+    e.stopPropagation();
+    if (item.photoUrl) {
+      Taro.previewImage({
+        urls: [item.photoUrl]
+      });
+    }
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case 'completed': return '已完成';
+      case 'tomorrow': return '明日处理';
+      default: return '待完善';
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'completed': return '#00b42a';
+      case 'tomorrow': return '#722ed1';
+      default: return '#86909c';
+    }
+  };
+
+  const showActionButtons = showActions && status === 'pending';
+
   return (
     <View 
       className={classnames(
         styles.item,
-        item.completed && styles.completed
+        status === 'completed' && styles.completed,
+        status === 'tomorrow' && styles.tomorrow
       )}
       onClick={handleToggle}
     >
       <View className={styles.checkbox}>
-        {item.completed ? (
+        {status === 'completed' && (
           <View className={styles.checked}>✓</View>
-        ) : (
+        )}
+        {status === 'tomorrow' && (
+          <View className={styles.tomorrowBox}>
+            <Text className={styles.tomorrowIcon}>📅</Text>
+          </View>
+        )}
+        {status === 'pending' && (
           <View className={styles.unchecked} />
         )}
       </View>
 
       <View className={styles.content}>
         <Text className={styles.name}>{item.name}</Text>
-        <Text className={styles.status}>
-          {item.completed ? '已完成' : '待完善'}
+        <Text className={styles.status} style={{ color: getStatusColor() }}>
+          {getStatusText()}
         </Text>
       </View>
 
-      {showActions && !item.completed && (
+      {item.photoUrl && (
+        <View className={styles.photoPreview} onClick={handlePreviewPhoto}>
+          <Image src={item.photoUrl} className={styles.photoImg} mode="aspectFill" />
+          <Text className={styles.photoLabel}>已补录</Text>
+        </View>
+      )}
+
+      {showActionButtons && (
         <View className={styles.actions}>
           {item.canPhoto && (
             <View className={styles.photoBtn} onClick={handlePhoto}>
