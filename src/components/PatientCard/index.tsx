@@ -2,9 +2,13 @@ import React from 'react';
 import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
-import type { Patient } from '@/types/patient';
+import type { Patient, CheckItem, CheckItemStatus } from '@/types/patient';
 import { treatmentTypeMap } from '@/data/mockPatients';
 import classnames from 'classnames';
+
+const getItemStatus = (item: CheckItem): CheckItemStatus => {
+  return item.status || (item.completed ? 'completed' : 'pending');
+};
 
 interface PatientCardProps {
   patient: Patient;
@@ -15,9 +19,9 @@ interface PatientCardProps {
 const PatientCard: React.FC<PatientCardProps> = ({ patient, showRiskTag = false, onClick }) => {
   const typeInfo = treatmentTypeMap[patient.treatmentType] || { name: '其他', color: '#86909c' };
   
-  const pendingCount = patient.checkItems.filter(item => item.status === 'pending').length;
-  const tomorrowCount = patient.checkItems.filter(item => item.status === 'tomorrow').length;
-  const completedCount = patient.checkItems.filter(item => item.status === 'completed').length;
+  const pendingCount = patient.checkItems.filter(item => getItemStatus(item) === 'pending').length;
+  const tomorrowCount = patient.checkItems.filter(item => getItemStatus(item) === 'tomorrow').length;
+  const completedCount = patient.checkItems.filter(item => getItemStatus(item) === 'completed').length;
   const isAllCompleted = completedCount === patient.checkItems.length;
   
   const hasRisk = patient.risks.length > 0;

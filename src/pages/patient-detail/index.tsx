@@ -6,8 +6,28 @@ import styles from './index.module.scss';
 import CheckItem from '@/components/CheckItem';
 import { usePatientStore } from '@/store/usePatientStore';
 import { treatmentTypeMap } from '@/data/mockPatients';
-import type { CheckItemKey, CheckItemStatus } from '@/types/patient';
+import type { Patient, CheckItemKey, CheckItemStatus } from '@/types/patient';
 import classnames from 'classnames';
+
+const defaultPatient: Patient = {
+  id: '001',
+  name: '默认患者',
+  gender: '男',
+  age: 30,
+  treatmentType: 'other',
+  treatmentName: '检查项目',
+  doctor: '医生',
+  startTime: '09:00',
+  endTime: '09:30',
+  fee: 0,
+  checkItems: [
+    { key: 'record', name: '病历书写', completed: true, status: 'completed' },
+    { key: 'photos', name: '术前术后照片', completed: false, canPhoto: true, status: 'pending' },
+    { key: 'advice', name: '处置医嘱', completed: true, status: 'completed' },
+    { key: 'signature', name: '患者签字', completed: true, status: 'completed' }
+  ],
+  risks: []
+};
 
 const PatientDetailPage: React.FC = () => {
   const router = useRouter();
@@ -22,7 +42,10 @@ const PatientDetailPage: React.FC = () => {
   } = usePatientStore();
 
   const patient = useMemo(() => {
-    return getPatientById(patientId) || patients[0];
+    const found = getPatientById(patientId);
+    if (found) return found;
+    if (patients.length > 0) return patients[0];
+    return defaultPatient;
   }, [patients, patientId, getPatientById]);
 
   const typeInfo = useMemo(() => {

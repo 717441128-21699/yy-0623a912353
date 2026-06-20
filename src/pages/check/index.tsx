@@ -4,10 +4,14 @@ import Taro from '@tarojs/taro';
 import styles from './index.module.scss';
 import CheckItem from '@/components/CheckItem';
 import { usePatientStore } from '@/store/usePatientStore';
-import type { CheckItemKey, CheckItemStatus } from '@/types/patient';
+import type { CheckItemKey, CheckItemStatus, CheckItem as CheckItemType } from '@/types/patient';
 import classnames from 'classnames';
 
 type FilterType = 'all' | 'pending' | 'tomorrow' | 'completed';
+
+const getItemStatus = (item: CheckItemType): CheckItemStatus => {
+  return item.status || (item.completed ? 'completed' : 'pending');
+};
 
 const CheckPage: React.FC = () => {
   const { patients, updateCheckItem, addPhoto } = usePatientStore();
@@ -17,13 +21,13 @@ const CheckPage: React.FC = () => {
   const stats = useMemo(() => {
     const total = patients.length;
     const completed = patients.filter(p => 
-      p.checkItems.every(item => item.status === 'completed')
+      p.checkItems.every(item => getItemStatus(item) === 'completed')
     ).length;
     const pending = patients.filter(p => 
-      p.checkItems.some(item => item.status === 'pending')
+      p.checkItems.some(item => getItemStatus(item) === 'pending')
     ).length;
     const tomorrow = patients.filter(p => 
-      p.checkItems.some(item => item.status === 'tomorrow')
+      p.checkItems.some(item => getItemStatus(item) === 'tomorrow')
     ).length;
     const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { total, completed, pending, tomorrow, percent };
@@ -32,12 +36,12 @@ const CheckPage: React.FC = () => {
   const filteredPatients = useMemo(() => {
     if (filter === 'all') return patients;
     if (filter === 'completed') {
-      return patients.filter(p => p.checkItems.every(item => item.status === 'completed'));
+      return patients.filter(p => p.checkItems.every(item => getItemStatus(item) === 'completed'));
     }
     if (filter === 'tomorrow') {
-      return patients.filter(p => p.checkItems.some(item => item.status === 'tomorrow'));
+      return patients.filter(p => p.checkItems.some(item => getItemStatus(item) === 'tomorrow'));
     }
-    return patients.filter(p => p.checkItems.some(item => item.status === 'pending'));
+    return patients.filter(p => p.checkItems.some(item => getItemStatus(item) === 'pending'));
   }, [patients, filter]);
 
   const toggleExpand = useCallback((id: string) => {
@@ -106,19 +110,19 @@ const CheckPage: React.FC = () => {
   }, [updateCheckItem]);
 
   const isPatientCompleted = (patient: typeof patients[0]) => {
-    return patient.checkItems.every(item => item.status === 'completed');
+    return patient.checkItems.every(item => getItemStatus(item) === 'completed');
   };
 
   const isPatientHasTomorrow = (patient: typeof patients[0]) => {
-    return patient.checkItems.some(item => item.status === 'tomorrow');
+    return patient.checkItems.some(item => getItemStatus(item) === 'tomorrow');
   };
 
   const getPendingCount = (patient: typeof patients[0]) => {
-    return patient.checkItems.filter(i => i.status === 'pending').length;
+    return patient.checkItems.filter(i => getItemStatus(i) === 'pending').length;
   };
 
   const getTomorrowCount = (patient: typeof patients[0]) => {
-    return patient.checkItems.filter(i => i.status === 'tomorrow').length;
+    return patient.checkItems.filter(i => getItemStatus(i) === 'tomorrow').length;
   };
 
   const getStatusText = (patient: typeof patients[0]) => {
