@@ -147,8 +147,20 @@ const CheckPage: React.FC = () => {
   return (
     <ScrollView scrollY className={styles.container}>
       <View className={styles.header}>
-        <Text className={styles.title}>每日自查</Text>
-        <Text className={styles.subtitle}>每天关门前10分钟，确保医疗质量</Text>
+        <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View>
+            <Text className={styles.title}>每日自查</Text>
+            <Text className={styles.subtitle}>每天关门前10分钟，确保医疗质量</Text>
+          </View>
+          {stats.tomorrow > 0 && (
+            <View 
+              className={styles.tomorrowEntry}
+              onClick={() => Taro.navigateTo({ url: '/pages/tomorrow-todo/index' })}
+            >
+              <Text>📅 明日待办 {stats.tomorrow}</Text>
+            </View>
+          )}
+        </View>
 
         <View className={styles.progressBar}>
           <View 

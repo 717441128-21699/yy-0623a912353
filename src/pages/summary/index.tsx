@@ -22,6 +22,15 @@ const SummaryPage: React.FC = () => {
     });
   }, [summary.summaryText]);
 
+  const handleCopyDoctor = useCallback((doctorText: string, doctorName: string) => {
+    Taro.setClipboardData({
+      data: doctorText,
+      success: () => {
+        Taro.showToast({ title: `已复制${doctorName}的话术`, icon: 'success' });
+      }
+    });
+  }, []);
+
   const handleShare = useCallback(() => {
     Taro.showActionSheet({
       itemList: ['发送到微信群', '发送给同事', '复制文字'],
@@ -77,9 +86,12 @@ const SummaryPage: React.FC = () => {
               <Text className={styles.statLabel}>已自查</Text>
             </View>
             {summary.tomorrowCheck > 0 && (
-              <View className={classnames(styles.statItem, styles.statTomorrow)}>
+              <View
+                className={classnames(styles.statItem, styles.statTomorrow)}
+                onClick={() => Taro.navigateTo({ url: '/pages/tomorrow-todo/index' })}
+              >
                 <Text className={styles.statNumber}>{summary.tomorrowCheck}</Text>
-                <Text className={styles.statLabel}>明日</Text>
+                <Text className={styles.statLabel}>明日 ›</Text>
               </View>
             )}
             <View className={classnames(styles.statItem, styles.statWarning)}>
@@ -149,6 +161,55 @@ const SummaryPage: React.FC = () => {
                     </View>
                   </View>
                   <Text className={styles.roleCount}>{role.count}例</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {summary.doctorSummaries.length > 0 && (
+          <View className={styles.section}>
+            <View className={styles.sectionTitle}>
+              <View className={styles.sectionDot} style={{ backgroundColor: '#722ed1' }} />
+              <Text>按医生分段提醒</Text>
+              <Text style={{ fontSize: '22rpx', color: '#86909c', marginLeft: '12rpx' }}>点击复制该医生话术</Text>
+            </View>
+            <View className={styles.doctorSummaryList}>
+              {summary.doctorSummaries.map(d => (
+                <View
+                  key={d.doctor}
+                  className={styles.doctorSummaryCard}
+                  onClick={() => handleCopyDoctor(d.doctorText, d.doctor)}
+                >
+                  <View className={styles.doctorSummaryHeader}>
+                    <View className={styles.doctorSummaryAvatar}>
+                      <Text>{d.doctor.charAt(0)}</Text>
+                    </View>
+                    <Text className={styles.doctorSummaryName}>{d.doctor}</Text>
+                    <View className={styles.doctorSummaryTag}>
+                      <Text>{d.pendingItems.length + d.tomorrowItems.length + d.riskItems.length}项</Text>
+                    </View>
+                  </View>
+                  <View className={styles.doctorSummaryContent}>
+                    {d.pendingItems.length > 0 && (
+                      <Text style={{ fontSize: '24rpx', color: '#ff7d00', display: 'block', marginBottom: '6rpx' }}>
+                        ⏳ 待完善 {d.pendingItems.length}项
+                      </Text>
+                    )}
+                    {d.tomorrowItems.length > 0 && (
+                      <Text style={{ fontSize: '24rpx', color: '#722ed1', display: 'block', marginBottom: '6rpx' }}>
+                        📅 明日处理 {d.tomorrowItems.length}项
+                      </Text>
+                    )}
+                    {d.riskItems.length > 0 && (
+                      <Text style={{ fontSize: '24rpx', color: '#f53f3f', display: 'block' }}>
+                        ⚠️ 风险项 {d.riskItems.length}项
+                      </Text>
+                    )}
+                  </View>
+                  <View className={styles.copyHint}>
+                    <Text>点击复制 ›</Text>
+                  </View>
                 </View>
               ))}
             </View>

@@ -3,7 +3,8 @@ export default defineAppConfig({
     'pages/today/index',
     'pages/check/index',
     'pages/summary/index',
-    'pages/patient-detail/index'
+    'pages/patient-detail/index',
+    'pages/tomorrow-todo/index'
   ],
   window: {
     backgroundTextStyle: 'light',

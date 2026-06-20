@@ -6,6 +6,17 @@ export type RiskType = 'noConsent' | 'feeMismatch' | 'noFollowUp';
 
 export type CheckItemStatus = 'completed' | 'pending' | 'tomorrow';
 
+export type ActionLogType = 'photo' | 'tomorrow' | 'completed' | 'markAllDone' | 'revert';
+
+export interface ActionLog {
+  id: string;
+  type: ActionLogType;
+  itemKey?: CheckItemKey;
+  itemName?: string;
+  timestamp: number;
+  detail?: string;
+}
+
 export interface CheckItem {
   key: CheckItemKey;
   name: string;
@@ -37,6 +48,7 @@ export interface Patient {
   risks: RiskItem[];
   followUpDate?: string;
   remark?: string;
+  actionLogs?: ActionLog[];
 }
 
 export interface TreatmentGroup {
@@ -45,6 +57,14 @@ export interface TreatmentGroup {
   count: number;
   color: string;
   patients: Patient[];
+}
+
+export interface DoctorSummary {
+  doctor: string;
+  pendingItems: { patientName: string; itemName: string; patientId: string; itemKey: CheckItemKey }[];
+  tomorrowItems: { patientName: string; itemName: string; patientId: string; itemKey: CheckItemKey }[];
+  riskItems: { patientName: string; riskName: string }[];
+  doctorText: string;
 }
 
 export interface SummaryStat {
@@ -56,4 +76,5 @@ export interface SummaryStat {
   riskByType: { type: RiskType; name: string; count: number }[];
   issuesByRole: { role: string; count: number }[];
   summaryText: string;
+  doctorSummaries: DoctorSummary[];
 }

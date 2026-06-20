@@ -1,4 +1,4 @@
-import type { Patient, TreatmentGroup, SummaryStat, CheckItem, CheckItemStatus } from '@/types/patient';
+import type { Patient, TreatmentGroup, SummaryStat, DoctorSummary, CheckItem, CheckItemStatus } from '@/types/patient';
 
 const getItemStatus = (item: CheckItem): CheckItemStatus => {
   return item.status || (item.completed ? 'completed' : 'pending');
@@ -316,7 +316,52 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
     return sum + p.checkItems.filter(item => getItemStatus(item) === 'tomorrow').length;
   }, 0);
   const riskCount = riskPatients.reduce((sum, p) => sum + p.risks.length, 0);
-  const totalIssues = pendingCount + tomorrowCount + riskCount;
+
+  const doctorMap: Record<string, DoctorSummary> = {};
+  patients.forEach(patient => {
+    const doc = patient.doctor;
+    if (!doctorMap[doc]) {
+      doctorMap[doc] = { doctor: doc, pendingItems: [], tomorrowItems: [], riskItems: [], doctorText: '' };
+    }
+    patient.checkItems.forEach(item => {
+      const s = getItemStatus(item);
+      if (s === 'pending') {
+        doctorMap[doc].pendingItems.push({ patientName: patient.name, itemName: item.name, patientId: patient.id, itemKey: item.key });
+      } else if (s === 'tomorrow') {
+        doctorMap[doc].tomorrowItems.push({ patientName: patient.name, itemName: item.name, patientId: patient.id, itemKey: item.key });
+      }
+    });
+    patient.risks.forEach(risk => {
+      doctorMap[doc].riskItems.push({ patientName: patient.name, riskName: risk.name });
+    });
+  });
+
+  const doctorSummaries = Object.values(doctorMap)
+    .filter(d => d.pendingItems.length > 0 || d.tomorrowItems.length > 0 || d.riskItems.length > 0)
+    .sort((a, b) => (b.pendingItems.length + b.tomorrowItems.length + b.riskItems.length) - (a.pendingItems.length + a.tomorrowItems.length + a.riskItems.length));
+
+  doctorSummaries.forEach(d => {
+    let text = `👨‍⚕️ ${d.doctor}：\n`;
+    if (d.pendingItems.length > 0) {
+      text += `⏳ 待完善：\n`;
+      d.pendingItems.forEach(item => {
+        text += `  · ${item.patientName} - ${item.itemName}\n`;
+      });
+    }
+    if (d.tomorrowItems.length > 0) {
+      text += `📅 明日处理：\n`;
+      d.tomorrowItems.forEach(item => {
+        text += `  · ${item.patientName} - ${item.itemName}\n`;
+      });
+    }
+    if (d.riskItems.length > 0) {
+      text += `⚠️ 风险项：\n`;
+      d.riskItems.forEach(item => {
+        text += `  · ${item.patientName} - ${item.riskName}\n`;
+      });
+    }
+    d.doctorText = text.trimEnd();
+  });
 
   const today = new Date();
   const dateStr = `${today.getMonth() + 1}月${today.getDate()}日`;
@@ -338,12 +383,11 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
     summaryText += `\n`;
   }
 
-  if (issuesByRole.length > 0) {
-    summaryText += `责任岗位：\n`;
-    issuesByRole.forEach(r => {
-      summaryText += `• ${r.role}：${r.count} 例问题\n`;
+  if (doctorSummaries.length > 0) {
+    summaryText += `📋 各医生待办：\n\n`;
+    doctorSummaries.forEach(d => {
+      summaryText += d.doctorText + `\n\n`;
     });
-    summaryText += `\n`;
   }
 
   summaryText += `整改要求：\n`;
@@ -366,6 +410,7 @@ export function calculateSummary(patients: Patient[]): SummaryStat {
     riskCount: riskPatients.length,
     riskByType,
     issuesByRole,
-    summaryText
+    summaryText,
+    doctorSummaries
   };
 }

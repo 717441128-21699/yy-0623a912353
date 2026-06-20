@@ -74,6 +74,69 @@
   color: #722ed1;
 }
 
+.statTomorrow {
+  cursor: pointer;
+}
+
+.doctorSummaryList {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.doctorSummaryCard {
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  position: relative;
+}
+
+.doctorSummaryHeader {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.doctorSummaryAvatar {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #722ed1, #9254de);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.doctorSummaryName {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1d2129;
+}
+
+.doctorSummaryTag {
+  background: #f5e6ff;
+  color: #722ed1;
+  border-radius: 16rpx;
+  padding: 4rpx 16rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.doctorSummaryContent {
+  padding-left: 68rpx;
+}
+
+.copyHint {
+  text-align: right;
+  font-size: 22rpx;
+  color: #c9cdd4;
+  margin-top: 12rpx;
+}
+
 .statSuccess .statNumber {
   color: $color-success;
 }

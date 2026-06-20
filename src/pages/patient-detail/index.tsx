@@ -6,7 +6,7 @@ import styles from './index.module.scss';
 import CheckItem from '@/components/CheckItem';
 import { usePatientStore } from '@/store/usePatientStore';
 import { treatmentTypeMap } from '@/data/mockPatients';
-import type { Patient, CheckItemKey, CheckItemStatus } from '@/types/patient';
+import type { Patient, CheckItemKey, CheckItemStatus, ActionLog } from '@/types/patient';
 import classnames from 'classnames';
 
 const defaultPatient: Patient = {
@@ -261,6 +261,44 @@ const PatientDetailPage: React.FC = () => {
             ))}
           </View>
         </View>
+
+        {patient.actionLogs && patient.actionLogs.length > 0 && (
+          <View className={styles.card}>
+            <View className={styles.sectionTitle}>
+              <View className={styles.sectionDot} style={{ backgroundColor: '#722ed1' }} />
+              <Text>处理记录 ({patient.actionLogs.length})</Text>
+            </View>
+            <View className={styles.logList}>
+              {patient.actionLogs.map(log => {
+                const time = new Date(log.timestamp);
+                const hours = time.getHours().toString().padStart(2, '0');
+                const minutes = time.getMinutes().toString().padStart(2, '0');
+                const seconds = time.getSeconds().toString().padStart(2, '0');
+                const timeStr = `${hours}:${minutes}:${seconds}`;
+                return (
+                  <View key={log.id} className={styles.logItem}>
+                    <View className={styles.logDot} />
+                    <View className={styles.logContent}>
+                      <View className={styles.logHeader}>
+                        <Text className={styles.logAction}>
+                          {log.type === 'photo' && '📸 拍照补录'}
+                          {log.type === 'tomorrow' && '📅 标记明日'}
+                          {log.type === 'completed' && '✅ 标记完成'}
+                          {log.type === 'markAllDone' && '🎉 全部完成'}
+                          {log.type === 'revert' && '↩️ 取消完成'}
+                        </Text>
+                        <Text className={styles.logTime}>{timeStr}</Text>
+                      </View>
+                      {log.detail && (
+                        <Text className={styles.logDetail}>{log.detail}</Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
         {patient.remark && (
           <View className={styles.remarkSection}>

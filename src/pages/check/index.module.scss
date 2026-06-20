@@ -12,6 +12,15 @@
   color: $color-text-white;
 }
 
+.tomorrowEntry {
+  background: rgba(114, 46, 209, 0.85);
+  border-radius: 24rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .title {
   font-size: $font-size-xl;
   font-weight: $font-weight-semibold;
