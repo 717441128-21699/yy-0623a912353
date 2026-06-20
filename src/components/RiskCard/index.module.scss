@@ -1,0 +1,111 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background: $color-bg-risk;
+  border: 2rpx solid $color-border-risk;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-md;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.treatment {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.riskBadge {
+  background: $color-error;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+}
+
+.riskBadgeText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-semibold;
+}
+
+.riskList {
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx dashed $color-border-risk;
+}
+
+.riskItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.riskDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-round;
+  background: $color-error;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+}
+
+.riskContent {
+  flex: 1;
+}
+
+.riskName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+  display: block;
+  margin-bottom: 2rpx;
+}
+
+.riskDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.doctor {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.handleText {
+  font-size: $font-size-sm;
+  color: $color-error;
+  font-weight: $font-weight-medium;
+}

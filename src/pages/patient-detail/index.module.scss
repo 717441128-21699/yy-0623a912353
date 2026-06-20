@@ -1,0 +1,337 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.patientHeader {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding;
+  color: $color-text-white;
+}
+
+.patientInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarText {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  font-size: 40rpx;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.meta {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+  margin-bottom: 4rpx;
+}
+
+.doctorInfo {
+  font-size: $font-size-sm;
+  opacity: 0.85;
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -20rpx;
+}
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.sectionDot {
+  width: 8rpx;
+  height: 32rpx;
+  border-radius: $radius-xs;
+  background: $color-primary;
+}
+
+.treatmentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.treatmentRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.treatmentLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.treatmentValue {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.feeValue {
+  font-size: $font-size-lg;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.tag {
+  font-size: $font-size-xs;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+}
+
+.checkList {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.checkBox {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.checked {
+    background: $color-success;
+    color: $color-text-white;
+    font-size: 28rpx;
+    font-weight: $font-weight-bold;
+  }
+
+  &.unchecked {
+    border: 3rpx solid $color-border;
+  }
+}
+
+.itemContent {
+  flex: 1;
+}
+
+.itemName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.itemStatus {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.itemActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  padding: 10rpx 24rpx;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &.photo {
+    background: $color-primary;
+    color: $color-text-white;
+  }
+
+  &.tomorrow {
+    background: $color-bg-hover;
+    color: $color-text-secondary;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.riskSection {
+  background: $color-bg-risk;
+  border: 2rpx solid $color-border-risk;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.riskTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.riskList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.riskItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx dashed $color-border-risk;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.riskDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-round;
+  background: $color-error;
+  margin-top: 14rpx;
+  flex-shrink: 0;
+}
+
+.riskInfo {
+  flex: 1;
+}
+
+.riskName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.riskDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.remarkSection {
+  background: #fffbe6;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.remarkTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: #d48806;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.remarkContent {
+  font-size: $font-size-sm;
+  color: #ad6800;
+  line-height: 1.6;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background: $color-bg-card;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.primaryBtn {
+  flex: 1;
+  height: $button-height-lg;
+  background: $color-primary;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.secondaryBtn {
+  flex: 1;
+  height: $button-height-lg;
+  background: $color-bg-hover;
+  border-radius: $radius-button;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-secondary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.8;
+  }
+}

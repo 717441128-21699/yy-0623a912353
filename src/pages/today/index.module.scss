@@ -1,0 +1,162 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding;
+  padding-top: 40rpx;
+  color: $color-text-white;
+}
+
+.dateRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.date {
+  font-size: $font-size-md;
+  opacity: 0.9;
+}
+
+.weekday {
+  font-size: $font-size-sm;
+  opacity: 0.8;
+}
+
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.statItem {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  text-align: center;
+  backdrop-filter: blur(10rpx);
+}
+
+.statNumber {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.statWarning .statNumber {
+  color: #ffeb3b;
+}
+
+.statDanger .statNumber {
+  color: #ffccc7;
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -20rpx;
+}
+
+.riskSection {
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg 0 $spacing-md;
+}
+
+.sectionTitleLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.sectionDot {
+  width: 8rpx;
+  height: 32rpx;
+  border-radius: $radius-xs;
+  background: $color-error;
+}
+
+.sectionTitleText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  background: $color-bg-risk;
+  color: $color-error;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+}
+
+.patientGroup {
+  margin-bottom: $spacing-md;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+}
+
+.groupLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.groupTag {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+}
+
+.groupName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.groupCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.groupArrow {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  transition: transform $transition-base;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.emptyTip {
+  text-align: center;
+  padding: $spacing-xl 0;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}

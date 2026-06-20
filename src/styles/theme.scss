@@ -1,0 +1,39 @@
+// ============================================
+// 主题配色变量
+// ============================================
+
+// 品牌主题色：医疗蓝，专业信任感
+$color-primary: #00a0e9;
+$color-primary-light: #40b8f0;
+$color-primary-dark: #0088cc;
+
+// 功能色
+$color-success: #00b42a;
+$color-warning: #ff7d00;
+$color-error: #f53f3f;
+$color-info: #00a0e9;
+
+// 业务色
+$color-cleaning: #00b42a;   // 洁牙 - 绿色
+$color-filling: #ff7d00;    // 补牙 - 橙色
+$color-extraction: #f53f3f; // 拔牙 - 红色
+$color-pediatric: #722ed1; // 儿牙 - 紫色
+$color-other: #86909c;     // 其他 - 灰色
+
+// 背景色
+$color-bg-page: #f5f7fa;
+$color-bg-card: #ffffff;
+$color-bg-hover: #f2f3f5;
+$color-bg-risk: #fff1f0;     // 风险卡片背景
+
+// 文本色
+$color-text-primary: #1d2129;
+$color-text-secondary: #4e5969;
+$color-text-tertiary: #86909c;
+$color-text-disabled: #c9cdd4;
+$color-text-white: #ffffff;
+
+// 边框色
+$color-border: #e5e6eb;
+$color-divider: #f2f3f5;
+$color-border-risk: #ffccc7;   // 风险边框色
